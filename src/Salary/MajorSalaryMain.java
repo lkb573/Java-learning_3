@@ -1,3 +1,5 @@
+package Salary;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -13,8 +15,9 @@ public class MajorSalaryMain {
 
         //19xx
         OptionalDouble ninethAver = list.stream()
-                .filter(x -> x.getYearID().isAfter(LocalDate.of(1985,1,1))
-                        && x.getYearID().isBefore(LocalDate.of(2000,1,1)))
+                .filter(x -> x.getYearID().getYear() < 2000
+                        /*x.getYearID().isAfter(LocalDate.of(1985,1,1))
+                        && x.getYearID().isBefore(LocalDate.of(2000,1,1))*/)
                 .mapToInt(x ->
                     x.getSalary()
                 ).average();
@@ -22,6 +25,7 @@ public class MajorSalaryMain {
 
         //all aver
         OptionalDouble allAver = list.stream()
+
                 .mapToInt(x -> x.getSalary())
                 .average();
         System.out.printf("All player Salary : %.2f\n", allAver.getAsDouble());
@@ -30,16 +34,31 @@ public class MajorSalaryMain {
         OptionalInt top = list.stream()
                 .mapToInt(x -> x.getSalary())
                 .max();
+
         OptionalInt low = list.stream()
                 .mapToInt(x -> x.getSalary())
                 .min();
-        System.out.println("Top Salary : " + top.getAsInt() + '\t' + "Low Salary : " + low.getAsInt());
+
+        MajorSalary topplay = list.stream()
+                .sorted((x,y) -> y.getSalary() - x.getSalary())
+                .findFirst()
+                .get();
+
+        MajorSalary lowplay = list.stream()
+                .sorted((x,y) -> x.getSalary() - y.getSalary())
+                .findFirst()
+                .get();
+
+
+        System.out.println("Top Salary & Player : " + topplay.getPlayerID() + " & " + top.getAsInt()
+                + '\t' +
+                "Low Salary & Player : " + lowplay.getPlayerID() + " & " + low.getAsInt());
 
 
         //NL Max
         OptionalInt topSalaryofNL = list.stream()
                 .filter(x -> x.getLeague().equals("NL"))
-                .mapToInt(x -> x.getSalary())
+                .mapToInt(MajorSalary::getSalary)
                 .max();
         System.out.println("Top Salary of NL : " + topSalaryofNL.getAsInt());
 
@@ -52,8 +71,8 @@ public class MajorSalaryMain {
 
         //Top 10
         OptionalDouble averOfTopten = list.stream()
-                .skip(10)
-                .sorted((x,y) -> x.getSalary() - y.getSalary())
+                .sorted((x,y) -> y.getSalary() - x.getSalary())
+                .limit(10)
                 .mapToInt(x -> x.getSalary())
                 .average();
         System.out.printf("Top 10 Salary aver : %.2f\n", averOfTopten.getAsDouble());
